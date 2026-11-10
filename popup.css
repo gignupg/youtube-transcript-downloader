@@ -36,6 +36,12 @@ dialog p {
   opacity: 0.85;
 }
 
+dialog #actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
 dialog form {
   margin-top: 1rem;
   text-align: right;
