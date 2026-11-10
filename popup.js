@@ -9,27 +9,43 @@ function showDialog(title, message) {
   dialog.showModal();
 }
 
-async function expandDescription(tabId) {
+async function openTranscript(tabId) {
   const results = await chrome.scripting.executeScript({
     target: { tabId },
-    func: () => {
-      const expander = document.querySelector("ytd-text-inline-expander");
-      const button = expander?.querySelector("#expand") ?? document.querySelector("#expand");
+    func: async () => {
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-      if (!button || button.hidden || button.getAttribute("aria-disabled") === "true") {
-        return { ok: false, message: "No 'more' button found on this page." };
+      const clickMore = () => {
+        const expander = document.querySelector("ytd-text-inline-expander");
+        const button = expander?.querySelector("#expand") ?? document.querySelector("#expand");
+        if (!button || button.hidden) return false;
+        button.scrollIntoView({ block: "center" });
+        button.click();
+        return true;
+      };
+
+      const findTranscriptButton = () =>
+        document.querySelector(
+          'ytd-video-description-transcript-section-renderer #primary-button button, button[aria-label="Show transcript"]'
+        );
+
+      clickMore();
+
+      let button = findTranscriptButton();
+      for (let i = 0; i < 30 && !button; i++) {
+        await sleep(100);
+        button = findTranscriptButton();
+      }
+
+      if (!button) {
+        return { ok: false, message: "Could not find the 'Show transcript' button." };
       }
 
       button.scrollIntoView({ block: "center" });
+      await sleep(100);
       button.click();
 
-      const collapsedAfterClick = expander?.hasAttribute("collapsed") ?? false;
-      return {
-        ok: !collapsedAfterClick,
-        message: collapsedAfterClick
-          ? "Clicked 'more', but the description is still collapsed."
-          : "Clicked 'more' — description expanded.",
-      };
+      return { ok: true, message: "Expanded description and clicked 'Show transcript'." };
     },
   });
 
@@ -53,12 +69,12 @@ async function main() {
 
   let result = { ok: false, message: "Unknown error." };
   try {
-    result = await expandDescription(tab.id);
+    result = await openTranscript(tab.id);
   } catch (error) {
     result = { ok: false, message: String(error?.message ?? error) };
   }
 
-  statusEl.textContent = result.ok ? "Description expanded." : "Could not expand description.";
+  statusEl.textContent = result.ok ? "Transcript opened." : "Could not open transcript.";
   showDialog(result.ok ? "Hello world" : "Something went wrong", result.message);
 }
 
