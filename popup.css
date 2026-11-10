@@ -19,3 +19,24 @@ p {
   font-size: 0.875rem;
   opacity: 0.75;
 }
+
+dialog {
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 8px;
+  padding: 1rem;
+  max-width: 100%;
+}
+
+dialog h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+dialog p {
+  opacity: 0.85;
+}
+
+dialog form {
+  margin-top: 1rem;
+  text-align: right;
+}

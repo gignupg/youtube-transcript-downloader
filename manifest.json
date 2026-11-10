@@ -3,6 +3,7 @@
   "name": "YouTube Transcript Downloader",
   "version": "0.1.0",
   "description": "Download transcripts from YouTube videos.",
+  "permissions": ["scripting", "activeTab"],
   "action": {
     "default_title": "YouTube Transcript Downloader",
     "default_popup": "popup.html",
